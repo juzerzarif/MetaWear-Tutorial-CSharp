@@ -25,6 +25,7 @@ namespace FreeFall_Detector {
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
     public sealed partial class DetectorSetup : Page {
+        private FnVoidPtr accDataHandlerDelegate;
         private FnVoid initDelegate;
         private BluetoothLEDevice selectedDevice;
         private BtleConnection btleConn;
@@ -42,6 +43,17 @@ namespace FreeFall_Detector {
 
         private void initialized() {
             System.Diagnostics.Debug.WriteLine("Board Initialized!");
+
+            mbl_mw_acc_set_odr(board, 25f);
+            mbl_mw_acc_write_acceleration_config(board);
+
+            accDataHandlerDelegate = new FnVoidPtr(dataPtr => {
+                var data = Marshal.PtrToStructure<Data>(dataPtr);
+                var acc_value = Marshal.PtrToStructure<CartesianFloat>(data.value);
+                System.Diagnostics.Debug.WriteLine("acceleration= " + acc_value);
+            });
+            var acc_signal = mbl_mw_acc_get_acceleration_data_signal(board);
+            mbl_mw_datasignal_subscribe(acc_signal, accDataHandlerDelegate);
         }
 
         private async void writeCharacteristic(IntPtr charPtr, IntPtr value, byte length) {
@@ -83,6 +95,16 @@ namespace FreeFall_Detector {
 
             board = mbl_mw_metawearboard_create(ref btleConn);
             mbl_mw_metawearboard_initialize(board, initDelegate);
+        }
+
+        private void start_Click(object sender, RoutedEventArgs e) {
+            mbl_mw_acc_enable_acceleration_sampling(board);
+            mbl_mw_acc_start(board);
+        }
+
+        private void stop_Click(object sender, RoutedEventArgs e) {
+            mbl_mw_acc_stop(board);
+            mbl_mw_acc_disable_acceleration_sampling(board);
         }
     }
 }
