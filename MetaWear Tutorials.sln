@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreeFall Detector", "FreeFall Detector\FreeFall Detector.csproj", "{109D4431-95C2-439B-9595-575E06DB74FD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM = Debug|ARM
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|ARM = Release|ARM
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{109D4431-95C2-439B-9595-575E06DB74FD}.Debug|ARM.ActiveCfg = Debug|ARM
+		{109D4431-95C2-439B-9595-575E06DB74FD}.Debug|ARM.Build.0 = Debug|ARM
+		{109D4431-95C2-439B-9595-575E06DB74FD}.Debug|ARM.Deploy.0 = Debug|ARM
+		{109D4431-95C2-439B-9595-575E06DB74FD}.Debug|x64.ActiveCfg = Debug|x64
+		{109D4431-95C2-439B-9595-575E06DB74FD}.Debug|x64.Build.0 = Debug|x64
+		{109D4431-95C2-439B-9595-575E06DB74FD}.Debug|x64.Deploy.0 = Debug|x64
+		{109D4431-95C2-439B-9595-575E06DB74FD}.Debug|x86.ActiveCfg = Debug|x86
+		{109D4431-95C2-439B-9595-575E06DB74FD}.Debug|x86.Build.0 = Debug|x86
+		{109D4431-95C2-439B-9595-575E06DB74FD}.Debug|x86.Deploy.0 = Debug|x86
+		{109D4431-95C2-439B-9595-575E06DB74FD}.Release|ARM.ActiveCfg = Release|ARM
+		{109D4431-95C2-439B-9595-575E06DB74FD}.Release|ARM.Build.0 = Release|ARM
+		{109D4431-95C2-439B-9595-575E06DB74FD}.Release|ARM.Deploy.0 = Release|ARM
+		{109D4431-95C2-439B-9595-575E06DB74FD}.Release|x64.ActiveCfg = Release|x64
+		{109D4431-95C2-439B-9595-575E06DB74FD}.Release|x64.Build.0 = Release|x64
+		{109D4431-95C2-439B-9595-575E06DB74FD}.Release|x64.Deploy.0 = Release|x64
+		{109D4431-95C2-439B-9595-575E06DB74FD}.Release|x86.ActiveCfg = Release|x86
+		{109D4431-95C2-439B-9595-575E06DB74FD}.Release|x86.Build.0 = Release|x86
+		{109D4431-95C2-439B-9595-575E06DB74FD}.Release|x86.Deploy.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
