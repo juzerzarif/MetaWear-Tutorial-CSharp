@@ -1,4 +1,5 @@
 ﻿using MbientLab.MetaWear.Core;
+using MbientLab.MetaWear.Processor;
 using static MbientLab.MetaWear.Functions;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,7 @@ namespace FreeFall_Detector {
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
     public sealed partial class DetectorSetup : Page {
+        private Dictionary<String, FnVoidPtr> dataprocDelegates;
         private FnVoidPtr accDataHandlerDelegate;
         private FnVoid initDelegate;
         private BluetoothLEDevice selectedDevice;
@@ -39,21 +41,44 @@ namespace FreeFall_Detector {
             btleConn.readGattChar = new FnVoidPtr(readCharacteristic);
 
             initDelegate = new FnVoid(initialized);
+
+            dataprocDelegates = new Dictionary<string, FnVoidPtr>();
         }
 
         private void initialized() {
             System.Diagnostics.Debug.WriteLine("Board Initialized!");
 
-            mbl_mw_acc_set_odr(board, 25f);
+            mbl_mw_acc_set_odr(board, 50f);
             mbl_mw_acc_write_acceleration_config(board);
-
-            accDataHandlerDelegate = new FnVoidPtr(dataPtr => {
-                var data = Marshal.PtrToStructure<Data>(dataPtr);
-                var acc_value = Marshal.PtrToStructure<CartesianFloat>(data.value);
-                System.Diagnostics.Debug.WriteLine("acceleration= " + acc_value);
-            });
+            
             var acc_signal = mbl_mw_acc_get_acceleration_data_signal(board);
-            mbl_mw_datasignal_subscribe(acc_signal, accDataHandlerDelegate);
+
+            dataprocDelegates["ff"] = new FnVoidPtr(ff => {
+                dataprocDelegates["ff_handler"] = new FnVoidPtr(dataPtr => {
+                    System.Diagnostics.Debug.WriteLine("In FreeFall");
+                });
+                mbl_mw_datasignal_subscribe(ff, dataprocDelegates["ff_handler"]);
+                System.Diagnostics.Debug.WriteLine("Processor Setup Complete");
+            });
+            dataprocDelegates["no_ff"] = new FnVoidPtr(noFF => {
+                dataprocDelegates["no_ff_handler"] = new FnVoidPtr(dataPtr => {
+                    System.Diagnostics.Debug.WriteLine("Not in FreeFall");
+                });
+                mbl_mw_datasignal_subscribe(noFF, dataprocDelegates["no_ff_handler"]);
+            });
+            dataprocDelegates["threshold"] = new FnVoidPtr(ths => {
+                mbl_mw_dataprocessor_comparator_create(ths, Comparator.Operation.EQ, 1, dataprocDelegates["no_ff"]);
+                mbl_mw_dataprocessor_comparator_create(ths, Comparator.Operation.EQ, -1, dataprocDelegates["ff"]);
+            });
+            dataprocDelegates["avg"] = new FnVoidPtr(avg => {
+                mbl_mw_dataprocessor_threshold_create(avg, Threshold.Mode.BINARY, 0.5f, 0,
+                    dataprocDelegates["threshold"]);
+            });
+            dataprocDelegates["rss"] = new FnVoidPtr(rss => {
+                mbl_mw_dataprocessor_average_create(rss, 4, dataprocDelegates["avg"]);
+            });
+            //whoops, wrong fn name
+            mbl_mw_dataprocessor_rss_create(acc_signal, dataprocDelegates["rss"]);
         }
 
         private async void writeCharacteristic(IntPtr charPtr, IntPtr value, byte length) {
