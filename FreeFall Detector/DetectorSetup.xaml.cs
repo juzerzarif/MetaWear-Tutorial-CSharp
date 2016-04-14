@@ -26,9 +26,11 @@ namespace FreeFall_Detector {
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
     public sealed partial class DetectorSetup : Page {
+        private LogDownloadHandler logDlHandler;
         private Dictionary<String, FnVoidPtr> dataprocDelegates;
         private FnVoidPtr accDataHandlerDelegate;
         private FnVoid initDelegate;
+        private FnVoid[] logReadyDelegates;
         private BluetoothLEDevice selectedDevice;
         private BtleConnection btleConn;
         private IntPtr board;
@@ -43,6 +45,8 @@ namespace FreeFall_Detector {
             initDelegate = new FnVoid(initialized);
 
             dataprocDelegates = new Dictionary<string, FnVoidPtr>();
+
+            logReadyDelegates = new FnVoid[2];
         }
 
         private void initialized() {
@@ -57,14 +61,21 @@ namespace FreeFall_Detector {
                 dataprocDelegates["ff_handler"] = new FnVoidPtr(dataPtr => {
                     System.Diagnostics.Debug.WriteLine("In FreeFall");
                 });
-                mbl_mw_datasignal_subscribe(ff, dataprocDelegates["ff_handler"]);
-                System.Diagnostics.Debug.WriteLine("Processor Setup Complete");
+                logReadyDelegates[0] = new FnVoid(() => {
+                    System.Diagnostics.Debug.WriteLine("Free Fall logger ready");
+                    System.Diagnostics.Debug.WriteLine("Processor Setup Complete");
+                });
+                mbl_mw_datasignal_log(ff, dataprocDelegates["ff_handler"], logReadyDelegates[0]);
+                
             });
             dataprocDelegates["no_ff"] = new FnVoidPtr(noFF => {
                 dataprocDelegates["no_ff_handler"] = new FnVoidPtr(dataPtr => {
                     System.Diagnostics.Debug.WriteLine("Not in FreeFall");
                 });
-                mbl_mw_datasignal_subscribe(noFF, dataprocDelegates["no_ff_handler"]);
+                logReadyDelegates[1] = new FnVoid(() => {
+                    System.Diagnostics.Debug.WriteLine("No Free Fall logger ready");
+                });
+                mbl_mw_datasignal_log(noFF, dataprocDelegates["no_ff_handler"], logReadyDelegates[1]);
             });
             dataprocDelegates["threshold"] = new FnVoidPtr(ths => {
                 mbl_mw_dataprocessor_comparator_create(ths, Comparator.Operation.EQ, 1, dataprocDelegates["no_ff"]);
@@ -123,6 +134,7 @@ namespace FreeFall_Detector {
         }
 
         private void start_Click(object sender, RoutedEventArgs e) {
+            mbl_mw_logging_start(board, 0);
             mbl_mw_acc_enable_acceleration_sampling(board);
             mbl_mw_acc_start(board);
         }
@@ -130,6 +142,21 @@ namespace FreeFall_Detector {
         private void stop_Click(object sender, RoutedEventArgs e) {
             mbl_mw_acc_stop(board);
             mbl_mw_acc_disable_acceleration_sampling(board);
+            mbl_mw_logging_stop(board);
+        }
+
+        private void download_Click(object sender, RoutedEventArgs e) {
+            logDlHandler = new LogDownloadHandler();
+            logDlHandler.receivedProgressUpdate = new FnUintUint((uint nEntriesLeft, uint totalEntries) => {
+                if (nEntriesLeft == 0) {
+                    System.Diagnostics.Debug.WriteLine("Log Download Completed!");
+                }
+            });
+            logDlHandler.receivedUnknownEntry = new FnUbyteLongByteArray((byte id, long epoch, IntPtr value, byte length) => {
+                System.Diagnostics.Debug.WriteLine("Received unknown log data: id= " + id);
+            });
+
+            mbl_mw_logging_download(board, 0, ref logDlHandler);
         }
     }
 }
