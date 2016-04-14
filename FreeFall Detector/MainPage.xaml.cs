@@ -29,6 +29,27 @@ namespace FreeFall_Detector
             throw new NotImplementedException();
         }
     }
+
+    public sealed class ConnectionStateColor : IValueConverter {
+        public SolidColorBrush ConnectedColor { get; set; }
+        public SolidColorBrush DisconnectedColor { get; set; }
+
+        public object Convert(object value, Type targetType, object parameter, string language) {
+            switch ((BluetoothConnectionStatus)value) {
+                case BluetoothConnectionStatus.Connected:
+                    return ConnectedColor;
+                case BluetoothConnectionStatus.Disconnected:
+                    return DisconnectedColor;
+                default:
+                    throw new MissingMemberException("Unrecognized connection status: " + value.ToString());
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language) {
+            throw new NotImplementedException();
+        }
+    }
+
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
@@ -37,6 +58,12 @@ namespace FreeFall_Detector
         public MainPage()
         {
             this.InitializeComponent();
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e) {
+            base.OnNavigatedTo(e);
+
+            refreshDevices_Click(null, null);
         }
 
         private async void refreshDevices_Click(object sender, RoutedEventArgs e) {

@@ -158,5 +158,12 @@ namespace FreeFall_Detector {
 
             mbl_mw_logging_download(board, 0, ref logDlHandler);
         }
+
+        private void back_Click(object sender, RoutedEventArgs e) {
+            mbl_mw_metawearboard_tear_down(board);
+            mbl_mw_metawearboard_free(board);
+
+            this.Frame.Navigate(typeof(MainPage));
+        }
     }
 }

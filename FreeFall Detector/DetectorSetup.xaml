@@ -11,5 +11,6 @@
         <Button x:Name="start" Content="Start" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="start_Click"/>
         <Button x:Name="stop" Content="Stop" HorizontalAlignment="Left" Margin="10,47,0,0" VerticalAlignment="Top" Click="stop_Click"/>
         <Button x:Name="download" Content="Download" HorizontalAlignment="Left" Margin="10,84,0,0" VerticalAlignment="Top" Click="download_Click"/>
+        <Button x:Name="back" Content="Back" HorizontalAlignment="Stretch" Margin="10,0" VerticalAlignment="Bottom" Click="back_Click"/>
     </Grid>
 </Page>
