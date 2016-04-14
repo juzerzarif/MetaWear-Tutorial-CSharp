@@ -17,7 +17,7 @@
             <RowDefinition Height="100*" />
         </Grid.RowDefinitions>
         <TextBlock x:Name="textBlock" HorizontalAlignment="Center" Text="Select Device" VerticalAlignment="Stretch"/>
-        <ListView x:Name="pairedDevices" HorizontalAlignment="Stretch" Grid.Row="1" VerticalAlignment="Stretch">
+        <ListView x:Name="pairedDevices" HorizontalAlignment="Stretch" Grid.Row="1" VerticalAlignment="Stretch" SelectionChanged="pairedDevices_SelectionChanged">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>

@@ -45,5 +45,13 @@ namespace FreeFall_Detector
                 pairedDevices.Items.Add(await BluetoothLEDevice.FromIdAsync(info.Id));
             }
         }
+
+        private void pairedDevices_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            BluetoothLEDevice selected = ((ListView)sender).SelectedItem as BluetoothLEDevice;
+
+            if (selected != null) {
+                this.Frame.Navigate(typeof(DetectorSetup), selected);
+            }
+        }
     }
 }
