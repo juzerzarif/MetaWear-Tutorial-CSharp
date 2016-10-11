@@ -27,72 +27,74 @@ namespace FreeFall_Detector {
     /// </summary>
     public sealed partial class DetectorSetup : Page {
         private LogDownloadHandler logDlHandler;
-        private Dictionary<String, FnVoidPtr> dataprocDelegates;
-        private FnVoidPtr accDataHandlerDelegate;
-        private FnVoid initDelegate;
-        private FnVoid[] logReadyDelegates;
+        private Dictionary<String, Fn_IntPtr> dataprocDelegates;
+        private Fn_IntPtr_Int initDelegate;
+        private Fn_IntPtr[] logReadyDelegates;
         private BluetoothLEDevice selectedDevice;
         private BtleConnection btleConn;
         private IntPtr board;
+        private Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristic notifyChar;
 
         public DetectorSetup() {
             this.InitializeComponent();
 
             btleConn = new BtleConnection();
-            btleConn.writeGattChar = new FnVoidPtrByteArray(writeCharacteristic);
-            btleConn.readGattChar = new FnVoidPtr(readCharacteristic);
+            btleConn.writeGattChar = new Fn_IntPtr_IntPtr_ByteArray(writeCharacteristic);
+            btleConn.readGattChar = new Fn_IntPtr_IntPtr(readCharacteristic);
 
-            initDelegate = new FnVoid(initialized);
+            initDelegate = new Fn_IntPtr_Int(initialized);
 
-            dataprocDelegates = new Dictionary<string, FnVoidPtr>();
+            dataprocDelegates = new Dictionary<string, Fn_IntPtr>();
 
-            logReadyDelegates = new FnVoid[2];
+            logReadyDelegates = new Fn_IntPtr[2];
         }
 
-        private void initialized() {
+        private void initialized(IntPtr board, int status) {
             System.Diagnostics.Debug.WriteLine("Board Initialized!");
 
+            mbl_mw_metawearboard_set_time_for_response(board, 500);
             mbl_mw_acc_set_odr(board, 50f);
             mbl_mw_acc_write_acceleration_config(board);
             
             var acc_signal = mbl_mw_acc_get_acceleration_data_signal(board);
 
-            dataprocDelegates["ff"] = new FnVoidPtr(ff => {
-                dataprocDelegates["ff_handler"] = new FnVoidPtr(dataPtr => {
+            dataprocDelegates["ff"] = new Fn_IntPtr(ff => {
+                dataprocDelegates["ff_handler"] = new Fn_IntPtr(dataPtr => {
                     System.Diagnostics.Debug.WriteLine("In FreeFall");
                 });
-                logReadyDelegates[0] = new FnVoid(() => {
+                logReadyDelegates[0] = new Fn_IntPtr(logger => {
+                    mbl_mw_logger_subscribe(logger, dataprocDelegates["ff_handler"]);
                     System.Diagnostics.Debug.WriteLine("Free Fall logger ready");
                     System.Diagnostics.Debug.WriteLine("Processor Setup Complete");
                 });
-                mbl_mw_datasignal_log(ff, dataprocDelegates["ff_handler"], logReadyDelegates[0]);
-                
+                mbl_mw_datasignal_log(ff, logReadyDelegates[0]);
             });
-            dataprocDelegates["no_ff"] = new FnVoidPtr(noFF => {
-                dataprocDelegates["no_ff_handler"] = new FnVoidPtr(dataPtr => {
+            dataprocDelegates["no_ff"] = new Fn_IntPtr(noFF => {
+                dataprocDelegates["no_ff_handler"] = new Fn_IntPtr(dataPtr => {
                     System.Diagnostics.Debug.WriteLine("Not in FreeFall");
                 });
-                logReadyDelegates[1] = new FnVoid(() => {
+                logReadyDelegates[1] = new Fn_IntPtr(logger => {
+                    mbl_mw_logger_subscribe(logger, dataprocDelegates["no_ff_handler"]);
                     System.Diagnostics.Debug.WriteLine("No Free Fall logger ready");
                 });
-                mbl_mw_datasignal_log(noFF, dataprocDelegates["no_ff_handler"], logReadyDelegates[1]);
+                mbl_mw_datasignal_log(noFF, logReadyDelegates[1]);
             });
-            dataprocDelegates["threshold"] = new FnVoidPtr(ths => {
+            dataprocDelegates["threshold"] = new Fn_IntPtr(ths => {
                 mbl_mw_dataprocessor_comparator_create(ths, Comparator.Operation.EQ, 1, dataprocDelegates["no_ff"]);
                 mbl_mw_dataprocessor_comparator_create(ths, Comparator.Operation.EQ, -1, dataprocDelegates["ff"]);
             });
-            dataprocDelegates["avg"] = new FnVoidPtr(avg => {
+            dataprocDelegates["avg"] = new Fn_IntPtr(avg => {
                 mbl_mw_dataprocessor_threshold_create(avg, Threshold.Mode.BINARY, 0.5f, 0,
                     dataprocDelegates["threshold"]);
             });
-            dataprocDelegates["rss"] = new FnVoidPtr(rss => {
+            dataprocDelegates["rss"] = new Fn_IntPtr(rss => {
                 mbl_mw_dataprocessor_average_create(rss, 4, dataprocDelegates["avg"]);
             });
             //whoops, wrong fn name
             mbl_mw_dataprocessor_rss_create(acc_signal, dataprocDelegates["rss"]);
         }
 
-        private async void writeCharacteristic(IntPtr charPtr, IntPtr value, byte length) {
+        private async void writeCharacteristic(IntPtr caller, IntPtr charPtr, IntPtr value, byte length) {
             byte[] managedArray = new byte[length];
             Marshal.Copy(value, managedArray, 0, length);
 
@@ -105,7 +107,7 @@ namespace FreeFall_Detector {
             }
         }
 
-        private async void readCharacteristic(IntPtr charPtr) {
+        private async void readCharacteristic(IntPtr caller, IntPtr charPtr) {
             var charGuid = Marshal.PtrToStructure<MbientLab.MetaWear.Core.GattCharacteristic>(charPtr).toGattCharGuid();
             var result = await selectedDevice.GetGattService(charGuid.serviceGuid).GetCharacteristics(charGuid.guid).FirstOrDefault()
                 .ReadValueAsync();
@@ -121,7 +123,7 @@ namespace FreeFall_Detector {
             base.OnNavigatedTo(e);
 
             selectedDevice = e.Parameter as BluetoothLEDevice;
-            var notifyChar = selectedDevice.GetGattService(GattCharGuid.METAWEAR_NOTIFY_CHAR.serviceGuid).GetCharacteristics(GattCharGuid.METAWEAR_NOTIFY_CHAR.guid).FirstOrDefault();
+            notifyChar = selectedDevice.GetGattService(GattCharGuid.METAWEAR_NOTIFY_CHAR.serviceGuid).GetCharacteristics(GattCharGuid.METAWEAR_NOTIFY_CHAR.guid).FirstOrDefault();
             await notifyChar.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
             notifyChar.ValueChanged += new TypedEventHandler<Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristic, GattValueChangedEventArgs>(
                 (Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristic sender, GattValueChangedEventArgs obj) => {
@@ -147,12 +149,12 @@ namespace FreeFall_Detector {
 
         private void download_Click(object sender, RoutedEventArgs e) {
             logDlHandler = new LogDownloadHandler();
-            logDlHandler.receivedProgressUpdate = new FnUintUint((uint nEntriesLeft, uint totalEntries) => {
+            logDlHandler.receivedProgressUpdate = new Fn_Uint_Uint((uint nEntriesLeft, uint totalEntries) => {
                 if (nEntriesLeft == 0) {
                     System.Diagnostics.Debug.WriteLine("Log Download Completed!");
                 }
             });
-            logDlHandler.receivedUnknownEntry = new FnUbyteLongByteArray((byte id, long epoch, IntPtr value, byte length) => {
+            logDlHandler.receivedUnknownEntry = new Fn_Ubyte_Long_ByteArray((byte id, long epoch, IntPtr value, byte length) => {
                 System.Diagnostics.Debug.WriteLine("Received unknown log data: id= " + id);
             });
 
