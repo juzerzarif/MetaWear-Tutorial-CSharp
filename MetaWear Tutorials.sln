@@ -11,6 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarterApp", "StarterApp\St
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		BtleDeviceScanner\BtleDeviceScanner.projitems*{109d4431-95c2-439b-9595-575e06db74fd}*SharedItemsImports = 4
 		BtleDeviceScanner\BtleDeviceScanner.projitems*{33f75f53-430c-475c-baf7-4649b6a5ce43}*SharedItemsImports = 4
 		BtleDeviceScanner\BtleDeviceScanner.projitems*{b655a585-4a51-4239-acd3-9068c77a1712}*SharedItemsImports = 13
 	EndGlobalSection
