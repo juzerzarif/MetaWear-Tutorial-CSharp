@@ -59,6 +59,7 @@ namespace MbientLab.BtleDeviceScanner {
         private BluetoothLEAdvertisementWatcher btleWatcher;
         private HashSet<ulong> seenDevices = new HashSet<ulong>();
         private IScanConfig config;
+        private Timer timer;
 
         public Scanner() {
             InitializeComponent();
@@ -89,6 +90,12 @@ namespace MbientLab.BtleDeviceScanner {
         /// Callback for the refresh button which populates the devices list
         /// </summary>
         private void refreshDevices_Click(object sender, RoutedEventArgs args) {
+            if (timer != null) {
+                timer.Dispose();
+                timer = null;
+            }
+            btleWatcher.Stop();
+
             var connected = pairedDevices.Items.Where(e => (e as BluetoothLEDevice).ConnectionStatus == BluetoothConnectionStatus.Connected);
 
             seenDevices.Clear();
@@ -100,7 +107,7 @@ namespace MbientLab.BtleDeviceScanner {
             }
 
             btleWatcher.Start();
-            new Timer(e => btleWatcher.Stop(), null, config.Duration, Timeout.Infinite);
+            timer = new Timer(e => btleWatcher.Stop(), null, config.Duration, Timeout.Infinite);
         }
 
         /// <summary>

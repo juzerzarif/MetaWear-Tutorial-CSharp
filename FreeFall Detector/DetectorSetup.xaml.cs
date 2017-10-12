@@ -31,19 +31,17 @@ namespace FreeFall_Detector {
 
         public DetectorSetup() {
             InitializeComponent();
-
-            
         }
         
         protected override async void OnNavigatedTo(NavigationEventArgs e) {
             base.OnNavigatedTo(e);
 
             metawear = MbientLab.MetaWear.Win10.Application.GetMetaWearBoard(e.Parameter as BluetoothLEDevice);
-            var accelerometer = metawear.GetModule<IAccelerometer>();
 
+            var accelerometer = metawear.GetModule<IAccelerometer>();
             accelerometer.Configure(odr: 50f);
             await accelerometer.Acceleration.AddRouteAsync(source =>
-                source.Map(Function1.Rss).Average(4).Find(Threshold.Binary, 0.5f)
+                source.Map(Function1.Rss).LowPass(4).Find(Threshold.Binary, 0.5f)
                     .Multicast()
                         .To().Filter(Comparison.Eq, -1).Log(data => System.Diagnostics.Debug.WriteLine("In FreeFall"))
                         .To().Filter(Comparison.Eq, 1).Log(data => System.Diagnostics.Debug.WriteLine("Not in FreeFall"))
