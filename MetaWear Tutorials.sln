@@ -9,10 +9,13 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "BtleDeviceScanner", "BtleDe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarterApp", "StarterApp\StarterApp.csproj", "{33F75F53-430C-475C-BAF7-4649B6A5CE43}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealTimeGraph", "RealTimeGraph\RealTimeGraph.csproj", "{75BB2D79-7921-46FC-B41A-0DFCCBE14112}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		BtleDeviceScanner\BtleDeviceScanner.projitems*{109d4431-95c2-439b-9595-575e06db74fd}*SharedItemsImports = 4
 		BtleDeviceScanner\BtleDeviceScanner.projitems*{33f75f53-430c-475c-baf7-4649b6a5ce43}*SharedItemsImports = 4
+		BtleDeviceScanner\BtleDeviceScanner.projitems*{75bb2d79-7921-46fc-b41a-0dfccbe14112}*SharedItemsImports = 4
 		BtleDeviceScanner\BtleDeviceScanner.projitems*{b655a585-4a51-4239-acd3-9068c77a1712}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -66,6 +69,26 @@ Global
 		{33F75F53-430C-475C-BAF7-4649B6A5CE43}.Release|x86.ActiveCfg = Release|x86
 		{33F75F53-430C-475C-BAF7-4649B6A5CE43}.Release|x86.Build.0 = Release|x86
 		{33F75F53-430C-475C-BAF7-4649B6A5CE43}.Release|x86.Deploy.0 = Release|x86
+		{75BB2D79-7921-46FC-B41A-0DFCCBE14112}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{75BB2D79-7921-46FC-B41A-0DFCCBE14112}.Debug|ARM.ActiveCfg = Debug|ARM
+		{75BB2D79-7921-46FC-B41A-0DFCCBE14112}.Debug|ARM.Build.0 = Debug|ARM
+		{75BB2D79-7921-46FC-B41A-0DFCCBE14112}.Debug|ARM.Deploy.0 = Debug|ARM
+		{75BB2D79-7921-46FC-B41A-0DFCCBE14112}.Debug|x64.ActiveCfg = Debug|x64
+		{75BB2D79-7921-46FC-B41A-0DFCCBE14112}.Debug|x64.Build.0 = Debug|x64
+		{75BB2D79-7921-46FC-B41A-0DFCCBE14112}.Debug|x64.Deploy.0 = Debug|x64
+		{75BB2D79-7921-46FC-B41A-0DFCCBE14112}.Debug|x86.ActiveCfg = Debug|x86
+		{75BB2D79-7921-46FC-B41A-0DFCCBE14112}.Debug|x86.Build.0 = Debug|x86
+		{75BB2D79-7921-46FC-B41A-0DFCCBE14112}.Debug|x86.Deploy.0 = Debug|x86
+		{75BB2D79-7921-46FC-B41A-0DFCCBE14112}.Release|Any CPU.ActiveCfg = Release|x86
+		{75BB2D79-7921-46FC-B41A-0DFCCBE14112}.Release|ARM.ActiveCfg = Release|ARM
+		{75BB2D79-7921-46FC-B41A-0DFCCBE14112}.Release|ARM.Build.0 = Release|ARM
+		{75BB2D79-7921-46FC-B41A-0DFCCBE14112}.Release|ARM.Deploy.0 = Release|ARM
+		{75BB2D79-7921-46FC-B41A-0DFCCBE14112}.Release|x64.ActiveCfg = Release|x64
+		{75BB2D79-7921-46FC-B41A-0DFCCBE14112}.Release|x64.Build.0 = Release|x64
+		{75BB2D79-7921-46FC-B41A-0DFCCBE14112}.Release|x64.Deploy.0 = Release|x64
+		{75BB2D79-7921-46FC-B41A-0DFCCBE14112}.Release|x86.ActiveCfg = Release|x86
+		{75BB2D79-7921-46FC-B41A-0DFCCBE14112}.Release|x86.Build.0 = Release|x86
+		{75BB2D79-7921-46FC-B41A-0DFCCBE14112}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
