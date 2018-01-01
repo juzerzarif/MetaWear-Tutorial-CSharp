@@ -1,20 +1,15 @@
-﻿using System;
+﻿using MbientLab.MetaWear;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using Windows.ApplicationModel.Core;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Advertisement;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
@@ -31,7 +26,6 @@ namespace MbientLab.BtleDeviceScanner {
             throw new NotImplementedException();
         }
     }
-
     public sealed class ConnectionStateColor : IValueConverter {
         public SolidColorBrush ConnectedColor { get; set; }
         public SolidColorBrush DisconnectedColor { get; set; }
@@ -52,16 +46,28 @@ namespace MbientLab.BtleDeviceScanner {
         }
     }
 
+    public class ScanConfig {
+        internal int Duration { get; }
+        internal Type NextPageType { get; }
+        internal List<Guid> ServiceUuids { get; }
+
+        public ScanConfig(Type nextPageType, int duration = 10000, List<Guid> serviceUuids = null) {
+            Duration = duration;
+            NextPageType = nextPageType;
+            ServiceUuids = serviceUuids == null ? new List<Guid>(new Guid[] { Constants.METAWEAR_GATT_SERVICE }) : serviceUuids;
+        }
+    }
+
     /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// Page that scans for and shows nearby Bluetooth LE devices.
     /// </summary>
-    public sealed partial class Scanner : Page {
+    public sealed partial class ScannerPage : Page {
         private BluetoothLEAdvertisementWatcher btleWatcher;
         private HashSet<ulong> seenDevices = new HashSet<ulong>();
-        private IScanConfig config;
+        private ScanConfig config;
         private Timer timer;
 
-        public Scanner() {
+        public ScannerPage() {
             InitializeComponent();
 
             btleWatcher = new BluetoothLEAdvertisementWatcher {
@@ -82,7 +88,7 @@ namespace MbientLab.BtleDeviceScanner {
         protected override void OnNavigatedTo(NavigationEventArgs e) {
             base.OnNavigatedTo(e);
 
-            config = e.Parameter as IScanConfig;
+            config = e.Parameter as ScanConfig;
             refreshDevices_Click(null, null);
         }
 
@@ -113,12 +119,22 @@ namespace MbientLab.BtleDeviceScanner {
         /// <summary>
         /// Callback for the devices list which navigates to the <see cref="DeviceSetup"/> page with the selected device
         /// </summary>
-        private void pairedDevices_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+        private async void pairedDevices_SelectionChanged(object sender, SelectionChangedEventArgs e) {
             btleWatcher.Stop();
             var item = ((ListView)sender).SelectedItem as BluetoothLEDevice;
 
             if (item != null) {
-                config.SelectedDevice(item);
+                ContentDialog initPopup = new ContentDialog() {
+                    Title = "Initializing API",
+                    Content = "Please wait while the app initializes the API"
+                };
+
+                initPopup.ShowAsync();
+                var board = MbientLab.MetaWear.Win10.Application.GetMetaWearBoard(item);
+                await board.InitializeAsync();
+                initPopup.Hide();
+
+                Frame.Navigate(config.NextPageType, item);
             }
         }
     }

@@ -9,15 +9,14 @@
     <Import_RootNamespace>MbientLab.BtleDeviceScanner</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Page Include="$(MSBuildThisFileDirectory)Scanner.xaml">
+    <Page Include="$(MSBuildThisFileDirectory)ScannerPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)IScanConfig.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Scanner.xaml.cs">
-      <DependentUpon>Scanner.xaml</DependentUpon>
+    <Compile Include="$(MSBuildThisFileDirectory)ScannerPage.xaml.cs">
+      <DependentUpon>ScannerPage.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>
