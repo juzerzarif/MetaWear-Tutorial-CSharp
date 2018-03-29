@@ -124,15 +124,16 @@ namespace MbientLab.BtleDeviceScanner {
             var item = ((ListView)sender).SelectedItem as BluetoothLEDevice;
 
             if (item != null) {
-                ContentDialog initPopup = new ContentDialog() {
+                /*ContentDialog initPopup = new ContentDialog() {
                     Title = "Initializing API",
                     Content = "Please wait while the app initializes the API"
                 };
 
-                initPopup.ShowAsync();
+                await initPopup.ShowAsync();*/
                 var board = MbientLab.MetaWear.Win10.Application.GetMetaWearBoard(item);
                 await board.InitializeAsync();
-                initPopup.Hide();
+                Console.WriteLine("Board initialized");
+                //initPopup.Hide();
 
                 Frame.Navigate(config.NextPageType, item);
             }
