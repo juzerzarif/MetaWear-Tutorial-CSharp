@@ -9,5 +9,7 @@
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Button x:Name="back" Content="Back" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Click="back_Click"/>
+        <Button Content="Start Temp Sensing" HorizontalAlignment="Left" Height="64" Margin="43,43,0,0" VerticalAlignment="Top" Width="154" Click="Button_Click"/>
+        <TextBox Name="temp_text" TextWrapping="Wrap" HorizontalAlignment="Left" Height="306" Margin="293,47,0,0" Text="" VerticalAlignment="Top" Width="907"/>
     </Grid>
 </Page>

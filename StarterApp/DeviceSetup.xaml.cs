@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -41,6 +42,16 @@ namespace StarterApp {
                 metawear.GetModule<IDebug>().DisconnectAsync();
             }
             Frame.GoBack();
+        }
+
+        private async void Button_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("Temp sensing started*");
+            back.IsEnabled = false;
+            temp_text.Text = "Temp sensing started";
+            System.Diagnostics.Debug.WriteLine(metawear.IsConnected);
+            
+            temp_text.Text += ("\nDevice Information: " + await metawear.ReadDeviceInformationAsync());
         }
     }
 }
